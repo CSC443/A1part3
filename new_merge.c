@@ -9,6 +9,15 @@ int new_merge_runs (New_MergeManager * merger){
 	//1. go in the loop through all input files and fill-in initial buffers
 	if (new_init_merge (merger)!=SUCCESS)
 		return FAILURE;
+	// int t=0;
+	// while (t<merger->total_input_buffer_elements[0]){
+	// 	Record t1;
+	// 	new_get_next_input_element(merger,0,0,&t1);
+	// 	printf("%d\n",merger->total_input_buffer_elements[0]);
+ //        printf("looking at table 1 :%d,%d\n", t1.uid1,t1.uid2);
+ //        merger->current_input_buffer_positions[0]++;
+ //        t=t+1;
+	// }
     int i=0;
     int j=0; 
     while (i<merger->heap_capacity && j<merger->heap_capacity){
@@ -20,17 +29,20 @@ int new_merge_runs (New_MergeManager * merger){
 			return FAILURE;
 		if (result1==EMPTY)
 		 	i = i + 1;
+		    merger->current_input_file_positions[0]=0;
             new_get_next_input_element(merger,i,0,&r1);
         result2 = new_get_next_input_element(merger,j,1,&r2); 
         if (result2==FAILURE)
 			return FAILURE;
         if (result2 == EMPTY)
          	j = j + 1;
+            merger->current_input_file_positions[1] = 0;
          	new_get_next_input_element(merger,j,1,&r2);
         printf("record1:%d,%d  ,  record2:%d,%d\n", r1.uid1,r1.uid2,r2.uid1,r2.uid2); 	
         if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1)){
         	printf("find match\n");
         	merger->current_input_buffer_positions[0]++;
+        	merger->current_input_buffer_positions[1]++;
         	merger->output_buffer [merger->current_output_buffer_position].uid1=r1.uid1;
 			merger->output_buffer [merger->current_output_buffer_position].uid2=r1.uid2;
 		    merger->current_output_buffer_position++;
@@ -74,7 +86,7 @@ int new_init_merge (New_MergeManager * manager) {
 	char k[100];
 	char * filename = (char *) calloc(121,sizeof(char));
 	sprintf(k,"%d",0);
-	strcat(filename,manager->input_prefix1);
+	strcat(filename,"uid1_");
 	strcat(filename,k);
 	strcat(filename,".dat");
     if (!(fp = fopen (filename , "rb" ))){
@@ -90,7 +102,7 @@ int new_init_merge (New_MergeManager * manager) {
 			// }
 			manager->current_input_file_positions[0] =  result;
 			manager->total_input_buffer_elements[0] = result;		
-			manager->current_input_buffer_positions[0]++;
+			//manager->current_input_buffer_positions[0]++;
 	}	
     fclose(fp);
 	free(filename);
@@ -99,7 +111,7 @@ int new_init_merge (New_MergeManager * manager) {
     char p[100];
 	char * filename1 = (char *) calloc(121,sizeof(char));
 	sprintf(p,"%d",0);
-	strcat(filename1,manager->input_prefix2);
+	strcat(filename1,"uid2_");
 	strcat(filename1,p);
 	strcat(filename1,".dat");
     if (!(fp1 = fopen (filename1 , "rb" ))){
@@ -109,18 +121,27 @@ int new_init_merge (New_MergeManager * manager) {
 			
 	}else{
            fseek(fp1, manager->current_input_file_positions[1]*sizeof(Record), SEEK_SET);
-           int result = fread (manager->input_buffers[1], sizeof(Record), manager->input_buffer_capacity, fp1);
+           int result2 = fread (manager->input_buffers[1], sizeof(Record), manager->input_buffer_capacity, fp1);
 			// if(result <= 0){
 			// 	manager->current_heap_size--;
 			// }
-			manager->current_input_file_positions[1] =  result;
-			manager->total_input_buffer_elements[1] = result;		
-			manager->current_input_buffer_positions[1]++;
+			manager->current_input_file_positions[1] =  result2;
+			manager->total_input_buffer_elements[1] = result2;		
+			//manager->current_input_buffer_positions[1]++;
 	}	
     fclose(fp1);
 	free(filename1);
 
 	
+	// int t=0;
+	// while (t<manager->total_input_buffer_elements[0]){
+	// 	Record t1;
+	// 	new_get_next_input_element(manager,0,0,&t1);
+	// 	printf("%d\n",manager->total_input_buffer_elements[0]);
+ //        printf("looking at table 1 :%d,%d\n", t1.uid1,t1.uid2);
+ //        manager->current_input_buffer_positions[0]++;
+ //        t=t+1;
+	// }
 	return SUCCESS;
 }
 

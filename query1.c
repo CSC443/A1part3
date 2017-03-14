@@ -79,7 +79,6 @@ int main (int argc, char *atgv[]){
                 if (r1==0){
                     perror("read buffer failed\n");
                 }
-                qsort (buffer, records_last_chunk, sizeof(Record), compare);
                 fwrite(buffer, sizeof(Record), records_last_chunk, fp_write);
                 fflush (fp_write);
                 free (buffer);
@@ -92,7 +91,6 @@ int main (int argc, char *atgv[]){
         if (r==0){
                     perror("read buffer failed\n");
         }
-        qsort (buffer, records_per_chunk, sizeof(Record), compare);
         fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
         fflush (fp_write);
 
