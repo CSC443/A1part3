@@ -44,11 +44,13 @@ int main(int argc, char *atgv[]){
 
 	//int total_records = file_size/sizeof(Record);
     int records_per_block = block_size/sizeof(Record);
-	int chunk_num = file_size/(block_num*block_size); 
-    int last_chunk_size = file_size - chunk_num*(block_num*block_size);
+	int chunk_num = file_size/mem;
+    int last_chunk_size = file_size - chunk_num*mem;
     int records_per_chunk = records_per_block*block_num;
     int records_last_chunk = last_chunk_size/sizeof(Record);
     int num_sublist;
+    printf("records_per_chunk:%d\n",records_per_chunk);
+    printf("size of record is %lu\n" , sizeof(Record));
     if (last_chunk_size!=0){
     	num_sublist = chunk_num;
 

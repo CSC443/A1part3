@@ -5,6 +5,8 @@
 #include "merge.h"
 
 int merge_sort(int buffer_num, int mem, int block_size);
+int new_merge_sort(int buffer_num, int mem, int block_size);
+int disk_sort(FILE *fp_read,int mem, int block_size);
 /**
 * Compares two records a and b 
 * with respect to the value of the integer field f.
@@ -20,13 +22,18 @@ int compare (const void *a, const void *b) {
 }
 
 int main (int argc, char *atgv[]){
+    //sort file by uid1 with 200MB mem and optimal block size
     FILE *fp_read;
-    int block_size = atoi(atgv[3]);
-    int mem = atoi(atgv[2]);
+    int block_size = atoi(atgv[2]);
+    static const int mem = 209715200 ;
     int block_num= (mem/block_size);
     if (!(fp_read = fopen (atgv[1], "rb" ))){
       return -1;
     }
+
+    fseek(fp_read, 0L, SEEK_END);
+    int file_size = ftell(fp_read);
+
     int records_per_block = block_size/sizeof(Record);
     int chunk_num = file_size/mem;
     int last_chunk_size = file_size - chunk_num*mem;
@@ -46,14 +53,13 @@ int main (int argc, char *atgv[]){
     fseek(fp_read, 0L, SEEK_SET);
     int run = 0;
     //printf("chunk num is %d,block num per chunk  is %d, last_chunk_size is %d\n",chunk_num,block_num,last_chunk_size);
-    
     while (run < chunk_num+1){
         FILE *fp_write;
         char k[chunk_num+1];
         sprintf(k,"%d",run);
         char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
         //printf("%s\n",filename );
-        strcat(filename,"uid1sorted");
+        strcat(filename,"uid1_");
         strcat(filename,k);
         strcat(filename,".dat");
         //printf("%s\n",filename );
@@ -101,28 +107,33 @@ int main (int argc, char *atgv[]){
    }
    fclose(fp_read);
 
+   // sort file by uid2 with 2 with name "sorted_merge.dat"
    if (!(fp_read = fopen (atgv[1], "rb" ))){
       return -1;
     }
-   disk_sort(FILE *fp_read,int mem, int block_size);
+   disk_sort(fp_read,mem, block_size);
+
 
    
+   //  partial sroted_merge.dat into several small pages.
     FILE *fp_read2;
     if (!(fp_read2 = fopen ("sorted_merge.dat", "rb" ))){
       return -1;
     }
+
     
+
     fseek(fp_read2, 0L, SEEK_SET);
-    int run = 0;
+    int run1 = 0;
     //printf("chunk num is %d,block num per chunk  is %d, last_chunk_size is %d\n",chunk_num,block_num,last_chunk_size);
     
-    while (run < chunk_num+1){
+    while (run1 < chunk_num+1){
         FILE *fp_write;
         char k[chunk_num+1];
-        sprintf(k,"%d",run);
+        sprintf(k,"%d",run1);
         char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
         //printf("%s\n",filename );
-        strcat(filename,"uid2sorted");
+        strcat(filename,"uid2_");
         strcat(filename,k);
         strcat(filename,".dat");
         //printf("%s\n",filename );
@@ -132,7 +143,7 @@ int main (int argc, char *atgv[]){
         perror("Error opening file");
         return -1;
         }   
-        if (run == chunk_num) {
+        if (run1 == chunk_num) {
             if (last_chunk_size== 0){
                    break;
 
@@ -165,12 +176,13 @@ int main (int argc, char *atgv[]){
        free(filename);
        fclose(fp_write);
 
-       run++; 
+       run1++; 
 
    }
    fclose(fp_read2);
-   // to do : scan sorted file uid1 and uid2, and calculate true friends;
 
+   // to do : scan sorted file uid1 and uid2, and calculate true friends;
+   new_merge_sort(num_sublist, mem, block_size);
    return 0;
 }
 
@@ -323,3 +335,44 @@ int disk_sort(FILE *fp_read,int mem, int block_size){
  	merge_runs(manager);
  	return 0;
  }
+
+int new_merge_sort(int buffer_num, int mem, int block_size){
+    printf("%s\n","start meger join" );
+    New_MergeManager * manager = (New_MergeManager *)calloc(1, sizeof(New_MergeManager));
+    int records_per_block  = block_size/sizeof(Record);
+    int block_num = mem/block_size;
+    int records_per_buffer = ((mem - block_size)/2)/sizeof(Record);
+
+    manager->heap_capacity = buffer_num;
+    manager->input_buffer_capacity = records_per_buffer;
+    manager->output_buffer_capacity = records_per_block;
+    int input_file_numbers[2];
+    int current_input_file_positions[2];
+    int current_input_buffer_positions[2];
+    int total_input_buffer_elements[2];
+    Record** input_buffers = malloc(2 * sizeof(Record *));
+    strcpy(manager->output_file_name , "query1.dat");
+    strcpy(manager->input_prefix1, "uid1_");
+    strcpy(manager->input_prefix2, "uid2_");
+    int i;
+    printf("%s\n","start loop" );
+    for(i = 0; i < 2; i++){
+        printf("i is %d\n", i);
+        input_file_numbers[i] = 0;
+        current_input_file_positions[i] = 0;
+        current_input_buffer_positions[i] = 0;
+        total_input_buffer_elements[i] = 0;
+        input_buffers[i] = (Record *)calloc(manager->input_buffer_capacity, sizeof(Record));
+    }   
+    manager->input_file_numbers = input_file_numbers;
+    manager->output_buffer = (Record *)calloc(manager->output_buffer_capacity, sizeof(Record));
+    manager->current_output_buffer_position = 0;
+    manager->input_buffers = input_buffers;
+    manager->current_input_file_positions = current_input_file_positions;
+    manager->current_input_buffer_positions = current_input_buffer_positions;
+    manager->total_input_buffer_elements = total_input_buffer_elements;
+    
+    new_merge_runs(manager);
+    return 0 ;
+
+}
