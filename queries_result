@@ -1,11 +1,11 @@
 Query1 : 
 
-select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A.uid2 = B.uid1;
+select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A.uid2 = B.uid1 where A.uid1 < A.uid2;
+
+21776094
 
 
-
-Time : 
-Run Time: real 1096.893 user 873.964000 sys 201.332000
+Run Time: real 812.041 user 657.192000 sys 139.692000
 
 
 
