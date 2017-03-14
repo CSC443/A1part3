@@ -1,11 +1,11 @@
 Query1 : 
 
-select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A.uid2 = B.uid1;
+select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A.uid2 = B.uid1 where A.uid1 < A.uid2;
+
+21776094
 
 
-
-Time : 
-Run Time: real 1096.893 user 873.964000 sys 201.332000
+Run Time: real 812.041 user 657.192000 sys 139.692000
 
 
 
@@ -20,6 +20,20 @@ select  ind.uid2, (CASE WHEN (out.c) IS NULL THEN ind.c ELSE (ind.c- out.c) END)
 Time:
 
 Run Time: real 1576.354 user 1452.732000 sys 95.536000
+
+sqlite> .timer on
+sqlite> select  ind.uid2, (CASE WHEN (out.c) IS NULL THEN ind.c ELSE (ind.c- out.c) END) as d from  (select B.uid2 as uid2,count(B.uid2) as c from followers as B group by B.uid2) as ind left join (select A.uid1 as uid1, count(A.uid1) as c from followers  as A group by A.uid1) as out on out.uid1 = ind.uid2  UNION select  out.uid1, (CASE WHEN (ind.c) IS NULL THEN -out.c ELSE (ind.c- out.c) END) as d from  (select A.uid1 as uid1,count(A.uid1) as c from followers as A group by A.uid1) as out left join (select B.uid2 as uid2, count(B.uid2) as c from followers  as B group by B.uid2) as ind on out.uid1 = ind.uid2 order by d DESC LIMIT 10;
+5994113,564220
+7496,344850
+1349110,340491
+1629776,170111
+8121005,155933
+2041453,152069
+797152,118752
+6623784,115819
+645019,107639
+3403,97931
+Run Time: real 1684.850 user 1556.872000 sys 98.140000
 
 
 
