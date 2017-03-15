@@ -84,7 +84,7 @@ int get_top_heap_element (MergeManager * merger, HeapElement * result){
 			else 
 				break;
 		}
-	}else{
+	}else if(merger->sort_uid == 2){
 		while ((child = (2 * parent) + 1) < merger->current_heap_size) {
 			// if there are two children, compare them 
 			if (child + 1 < merger->current_heap_size && 
@@ -93,6 +93,21 @@ int get_top_heap_element (MergeManager * merger, HeapElement * result){
 			
 			// compare item with the larger 
 			if (compare_heap_elements2(&item, &(merger->heap[child]))>0) {
+				merger->heap[parent] = merger->heap[child];
+				parent = child;
+			} 
+			else 
+				break;
+		}
+	}else{
+		while ((child = (2 * parent) + 1) < merger->current_heap_size) {
+			// if there are two children, compare them 
+			if (child + 1 < merger->current_heap_size && 
+					(compare_heap_elements3(&(merger->heap[child]),&(merger->heap[child + 1]))>0)) 
+				++child;
+			
+			// compare item with the larger 
+			if (compare_heap_elements3(&item, &(merger->heap[child]))>0) {
 				merger->heap[parent] = merger->heap[child];
 				parent = child;
 			} 
@@ -132,10 +147,20 @@ int insert_into_heap (MergeManager * merger, int run_id, Record *input){
 			else 
 				break;
 		}
-	}else{
+	}else if(merger->sort_uid == 2){
 		while (child > 0) {
 			parent = (child - 1) / 2;
 			if (compare_heap_elements2(&(merger->heap[parent]),&new_heap_element)>0) {
+				merger->heap[child] = merger->heap[parent];
+				child = parent;
+			} 
+			else 
+				break;
+		}
+	}else{
+		while (child > 0) {
+			parent = (child - 1) / 2;
+			if (compare_heap_elements3(&(merger->heap[parent]),&new_heap_element)>0) {
 				merger->heap[child] = merger->heap[parent];
 				child = parent;
 			} 
@@ -307,5 +332,12 @@ int compare_heap_elements1 (HeapElement *a, HeapElement *b) {
             return 1;
         }
     }
+	return 0;
+}
+
+int compare_heap_elements3(HeapElement *a, HeapElement *b){
+	if(a->UID2 > b->UID2){
+		return 1;
+	}
 	return 0;
 }

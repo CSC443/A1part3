@@ -70,6 +70,8 @@ int compare_heap_elements1 (HeapElement *a, HeapElement *b);
 
 int compare_heap_elements2 (HeapElement *a, HeapElement *b);
 
+int compare_heap_elements3(HeapElement *a, HeapElement *b);
+
 // a new structure 
 
 
