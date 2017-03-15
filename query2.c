@@ -32,11 +32,11 @@ int main (int argc, char *atgv[]){
    }
    fclose (fp_read);
    free (buffer);
-  // remove("query2.dat");
-  // remove("sorted_uid2.dat");
-  // remove("sorted_uid1.dat");
-  // remove("outdegree.dat");
-  // remove("indegree.dat");
+  remove("query2.dat");
+  remove("sorted_uid2.dat");
+  remove("sorted_uid1.dat");
+  remove("outdegree.dat");
+  remove("indegree.dat");
    return 0;
    
 }
