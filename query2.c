@@ -13,12 +13,18 @@ int main (int argc, char *atgv[]){
     static const int mem = 209715200 ;
     disk_sort(atgv[1], mem, block_size, 1, "sorted_uid1.dat");
     disk_sort(atgv[1], mem, block_size, 2, "sorted_uid2.dat");
-
+    write_degree("sorted_uid1.dat", block_size, 0, "outdegree.dat");
+    write_degree("sorted_uid2.dat", block_size, 1, "indegree.dat");
    // to do : scan sorted file uid1 and uid2, and calculate true friends;
    merge_sort_join(mem, block_size);
+   disk_sort("query2.dat", mem, block_size, 3, "sorted_query2.dat");
+   remove("query2.dat");
+   remove("sorted_uid2.dat");
+   remove("sorted_uid1.dat");
+   remove("outdegree.dat");
+   remove("indegree.dat");
    return 0;
 }
-
 
 int merge_sort_join(int mem, int block_size){
     printf("%s\n","start meger join" );
@@ -33,9 +39,9 @@ int merge_sort_join(int mem, int block_size){
     int current_input_buffer_positions[2];
     int total_input_buffer_elements[2];
     Record** input_buffers = malloc(2 * sizeof(Record *));
-    strcpy(manager->output_file_name , "query1.dat");
-    strcpy(manager->input_file_name_1, "sorted_uid1.dat");
-    strcpy(manager->input_file_name_2, "sorted_uid2.dat");
+    strcpy(manager->output_file_name , "query2.dat");
+    strcpy(manager->input_file_name_1, "outdegree.dat");
+    strcpy(manager->input_file_name_2, "indegree.dat");
     int i;
     for(i = 0; i < 2; i++){
         current_input_file_positions[i] = 0;
@@ -49,7 +55,7 @@ int merge_sort_join(int mem, int block_size){
     manager->current_input_file_positions = current_input_file_positions;
     manager->current_input_buffer_positions = current_input_buffer_positions;
     manager->total_input_buffer_elements = total_input_buffer_elements;
-    manager->is_query1 = 0;
+    manager->is_query1 = 1;
     new_merge_runs(manager);
     return 0 ;
 

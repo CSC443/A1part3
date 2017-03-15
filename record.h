@@ -16,6 +16,8 @@ void csv_to_record(char* filename, char* block_size);
 void write_buffer_to_disk(Record* buffer, int total_records, FILE *fp);
 void write_result_to_file(char *filename, int block_size, float speed);
 
+int flush_outputbuffer (char* filename, Record *output_buffer, int current_output_buffer_position);
+int write_degree(char* input_filename, int block_size, int is_outdegree, char* output_filename);
 
 
 #endif

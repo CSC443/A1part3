@@ -91,6 +91,7 @@ typedef struct new_merge_manager {
 	//int current_heap_size;
 	int heap_capacity;  //corresponds to the total number of runs (input buffers)
 	char output_file_name [MAX_PATH_LENGTH]; //stores name of the file to which to write the final output
+	int is_query1;
 }New_MergeManager;
 
 //1. main loop
@@ -116,6 +117,10 @@ int new_refill_buffer (New_MergeManager * manager, int type);
 
 //8. Frees all dynamically allocated memory
 void new_clean_up (New_MergeManager * merger);
+
+int query2_join(Record r1, Record r2, New_MergeManager * merger);
+
+int query1_join(Record r1, Record r2, New_MergeManager * merger);
 
 
 

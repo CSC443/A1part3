@@ -38,6 +38,16 @@ int compare_uid1 (const void *a, const void *b) {
 
 }
 
+int compare_celebrity(const void *a, const void *b) {
+    int a_uid2 = ((const struct record*)a)->uid2;
+    int b_uid2= ((const struct record*)b)->uid2;
+    if(b_uid2 > a_uid2){
+        return 1;
+    }
+    return -1;
+
+}
+
 // int main(int argc, char *atgv[]){
 //     int block_size = atoi(atgv[3]);
 //     int mem = atoi(atgv[2]);
@@ -45,18 +55,10 @@ int compare_uid1 (const void *a, const void *b) {
 // }
 
 int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* output_filename){
- 	//printf("start disk_sort\n");
- 	//FILE *fp_write;
+
  	FILE *fp_read;
-    // int block_size = atoi(atgv[3]);
-    // int mem = atoi(atgv[2]);
-    // int sort_uid = atoi(atgv[4]);
     
     int block_num= (mem/block_size);
-    //printf("%d,%d\n", mem,block_size);
-    //printf("This is block_num %d\n",block_num);
-    //printf("size of record:%d\n",sizeof(Record));
-    //int num_records = mem / sizeof(Record);
 
 	if (!(fp_read = fopen (filename , "rb" ))){
 		return -1;
@@ -65,9 +67,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 	// find file size
     fseek(fp_read, 0L, SEEK_END);
 	int file_size = ftell(fp_read);
-	//printf("file size %d\n", file_size);
-
-	//int total_records = file_size/sizeof(Record);
     int records_per_block = block_size/sizeof(Record);
 	int chunk_num = file_size/mem;
     int last_chunk_size = file_size - chunk_num*mem;
@@ -82,8 +81,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
     }else{
         num_sublist = chunk_num + 1; 
     }
-    //printf("%d\n",num_sublist);
-    //printf("required memory for phase 2 is %d, mem is %d\n",(num_sublist+1)*block_size,mem );
     if (((num_sublist+1)*block_size) > mem){
     	perror("not enough memory");
     	return 0;
@@ -91,8 +88,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 	//set pointe to the begining of the file
 	fseek(fp_read, 0L, SEEK_SET);
     int run = 0;
-    //printf("chunk num is %d,block num per chunk  is %d, last_chunk_size is %d\n",chunk_num,block_num,last_chunk_size);
-    
     while (run < chunk_num+1){
     	FILE *fp_write;
     	char k[chunk_num+1];
@@ -101,19 +96,21 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 		//printf("%s\n",filename );
         if(sort_uid == 1){
             strcat(filename,"sorted1_");
-        }else{
+        }else if(sort_uid == 2){
             strcat(filename,"sorted2_");
+        }else{
+            strcat(filename,"sorted3_");
         }
 
 		strcat(filename,k);        
         
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
+		printf("%s\n",filename );
 		//printf("%s\n",strcat(strcat("sorted",k), ".dat") );
-		fp_write = fopen( filename, "wb");
+		fp_write = fopen(filename, "wb");
 		if(fp_write == NULL){
-	 	perror("Error opening file");
-	 	return -1;
+	 	     perror("Error opening file");
+	 	     return -1;
 	    }	
         if (run == chunk_num) {
         	if (last_chunk_size== 0){
@@ -127,10 +124,12 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
                 }
                 if(sort_uid == 2){
                     qsort (buffer, records_last_chunk, sizeof(Record), compare_uid2);
-                }else{
+                }else if(sort_uid == 1){
                     qsort (buffer, records_last_chunk, sizeof(Record), compare_uid1);
+                }else{
+                    qsort (buffer, records_last_chunk, sizeof(Record), compare_celebrity);
                 }
-				
+
 				fwrite(buffer, sizeof(Record), records_last_chunk, fp_write);
 				fflush (fp_write);
                 free (buffer);
@@ -145,8 +144,10 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
         }
         if(sort_uid == 2){
             qsort (buffer, records_per_chunk, sizeof(Record), compare_uid2);
-        }else{
+        }else if(sort_uid == 1){
             qsort (buffer, records_per_chunk, sizeof(Record), compare_uid1);
+        }else{
+            qsort (buffer, records_per_chunk, sizeof(Record), compare_celebrity);
         }
 //		qsort (buffer, records_per_chunk, sizeof(Record), compare);
 		fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
@@ -168,6 +169,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
  }
 
  int merge_sort(int buffer_num, int mem, int block_size, char* output_filename, int sort_uid){
+    printf("merge\n");
  	MergeManager * manager = (MergeManager *)calloc(1, sizeof(MergeManager));
 
  	int records_per_block  = block_size/sizeof(Record);
@@ -180,8 +182,10 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
  	strcpy(manager->output_file_name , output_filename);
     if(sort_uid == 1){
         strcpy(manager->input_prefix, "sorted1_");
-    }else{
+    }else if(sort_uid == 2){
         strcpy(manager->input_prefix, "sorted2_"); 
+    }else{
+        strcpy(manager->input_prefix, "sorted3_"); 
     } 
  	
  	if(block_num % (buffer_num + 1) > 0){

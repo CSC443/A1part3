@@ -267,6 +267,16 @@ void clean_up (MergeManager * merger) {
 		free(merger->input_buffers[i]);
 		//printf("i\n");
 	}
+	for(i = 0; i < merger->heap_capacity; i++){
+		char k[100];
+		char * filename = (char *) calloc(121,sizeof(char));
+		sprintf(k,"%d",merger->input_file_numbers[i]);
+		strcat(filename,merger->input_prefix);
+		strcat(filename,k);
+		strcat(filename,".dat");
+		//printf("%s\n",filename );
+		remove(filename);
+	}
 	free(merger->input_buffers);
 	//printf("2\n");
 	free(merger->output_buffer);

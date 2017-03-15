@@ -52,5 +52,35 @@ sqlite> select  ind.uid2, (CASE WHEN (out.c) IS NULL THEN ind.c ELSE (ind.c- out
 3403,97931
 Run Time: real 1684.850 user 1556.872000 sys 98.140000
 
+real        38.34
+user        29.64
+sys          7.10
+ 492335104  maximum resident set size
+         0  average shared memory size
+         0  average unshared data size
+         0  average unshared stack size
+    487556  page reclaims
+         4  page faults
+         0  swaps
+      1207  block input operations
+        52  block output operations
+         0  messages sent
+         0  messages received
+         0  signals received
+      1222  voluntary context switches
+     64096  involuntary context switches
+
+uid 5994113, uid2 564220
+uid 7496, uid2 344850
+uid 1349110, uid2 340491
+uid 1629776, uid2 170111
+uid 8121005, uid2 155933
+uid 2041453, uid2 152069
+uid 797152, uid2 118752
+uid 6623784, uid2 115819
+uid 645019, uid2 107639
+uid 3403, uid2 97931
+
+
 
 
