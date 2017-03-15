@@ -73,8 +73,8 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
     int records_per_chunk = records_per_block*block_num;
     int records_last_chunk = last_chunk_size/sizeof(Record);
     int num_sublist;
-    printf("records_per_chunk:%d\n",records_per_chunk);
-    printf("size of record is %lu\n" , sizeof(Record));
+    //printf("records_per_chunk:%d\n",records_per_chunk);
+    //printf("size of record is %lu\n" , sizeof(Record));
     if (last_chunk_size!=0){
     	num_sublist = chunk_num;
 
@@ -105,7 +105,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 		strcat(filename,k);        
         
 		strcat(filename,".dat");
-		printf("%s\n",filename );
+		//printf("%s\n",filename );
 		//printf("%s\n",strcat(strcat("sorted",k), ".dat") );
 		fp_write = fopen(filename, "wb");
 		if(fp_write == NULL){
@@ -169,7 +169,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
  }
 
  int merge_sort(int buffer_num, int mem, int block_size, char* output_filename, int sort_uid){
-    printf("merge\n");
+    //printf("merge\n");
  	MergeManager * manager = (MergeManager *)calloc(1, sizeof(MergeManager));
 
  	int records_per_block  = block_size/sizeof(Record);

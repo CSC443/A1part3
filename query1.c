@@ -16,12 +16,14 @@ int main (int argc, char *atgv[]){
 
    // to do : scan sorted file uid1 and uid2, and calculate true friends;
    merge_sort_join(mem, block_size);
+   remove("sorted_uid2.dat");
+    remove("sorted_uid1.dat");
    return 0;
 }
 
 
 int merge_sort_join(int mem, int block_size){
-    printf("%s\n","start meger join" );
+    //printf("%s\n","start meger join" );
     New_MergeManager * manager = (New_MergeManager *)calloc(1, sizeof(New_MergeManager));
     int records_per_block  = block_size/sizeof(Record);
     int mem_per_block = mem/block_size;

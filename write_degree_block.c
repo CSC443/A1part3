@@ -13,7 +13,6 @@ int write_degree(char* input_filename, int block_size, int is_outdegree, char* o
 	int output_buffer_capacity = records_per_block*(mem_per_block - 1);
 	Record * output_buffer = (Record *)calloc(output_buffer_capacity, sizeof(Record));
 	int current_output_buffer_position = 0;
-	printf("%d\n", is_outdegree);
 
 	FILE *fp_read;
 
@@ -27,12 +26,8 @@ int write_degree(char* input_filename, int block_size, int is_outdegree, char* o
 
 	//Figure out the file size
 	fseek(fp_read, 0L, SEEK_END);
-	int file_size = ftell(fp_read);
-
 	//Set the point back to begining of the file
 	fseek(fp_read, 0L, SEEK_SET);
-
-	printf("%lu\n", file_size/sizeof(Record));
 	
 	/* read records into buffer */
 	int result = 0;

@@ -3,7 +3,7 @@
 
 //manager fields should be already initialized in the caller
 int new_merge_runs (New_MergeManager * merger){	
-	printf("new_merge_runs start\n");
+	//printf("new_merge_runs start\n");
 	int result1; //stores SUCCESS/FAILURE returned at the end	
 	int result2;
 	
@@ -12,6 +12,7 @@ int new_merge_runs (New_MergeManager * merger){
 		return FAILURE;
 	Record *r1 = (Record *) calloc (1, sizeof (Record)) ;
     Record *r2 = (Record *) calloc (1, sizeof (Record)) ;
+    int count = 0;
     while (merger->current_input_file_positions[0] != -1 && merger->current_input_file_positions[1] != -1){
         
         result1 = new_get_next_input_element(merger,0,r1);
@@ -21,7 +22,7 @@ int new_merge_runs (New_MergeManager * merger){
         if (result2==FAILURE)
 			return FAILURE;
 		if(merger->is_query1 == 0){
-			query1_join(r1, r2, merger);
+			query1_join(r1, r2, merger, &count);
 		}else{
 			query2_join(r1, r2, merger);
 		}
@@ -36,7 +37,9 @@ int new_merge_runs (New_MergeManager * merger){
 		if(new_flush_output_buffer(merger)!=SUCCESS)
 			return FAILURE;
 	}
-	
+	if(merger->is_query1 == 0){
+		printf("total number match %d\n", count);
+	}
 	new_clean_up(merger);
 	return SUCCESS;	
 }
@@ -85,18 +88,19 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger){
     return SUCCESS;	
 }
 
-int query1_join(Record *r1, Record *r2, New_MergeManager * merger){
+int query1_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 	if ((r1->uid1==r2->uid2) && (r1->uid2 == r2->uid1) && (r1->uid1 < r1->uid2)){
-    	printf("find match\n");
+    	//printf("find match\n");
+    	count++;
     	merger->current_input_buffer_positions[0]++;
     	merger->current_input_buffer_positions[1]++;
     	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
 		merger->output_buffer [merger->current_output_buffer_position].uid2=r1->uid2;
 	    merger->current_output_buffer_position++;
-    	printf("record1:%d,%d  ,record2:%d,%d\n", r1->uid1,r1->uid2,r2->uid1,r2->uid2); 	
+    	//printf("record1:%d,%d  ,record2:%d,%d\n", r1->uid1,r1->uid2,r2->uid1,r2->uid2); 	
         
 	    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
-	    	printf("go go go\n");
+	    	//printf("go go go\n");
 			if(new_flush_output_buffer(merger)!=SUCCESS) {
 				return FAILURE;			
 				merger->current_output_buffer_position=0;
