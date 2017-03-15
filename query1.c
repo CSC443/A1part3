@@ -13,8 +13,8 @@ int main (int argc, char *atgv[]){
     int block_size = atoi(atgv[2]);
     static const int mem = 209715200 ;
     int block_num= (mem/block_size);
-    //disk_sort(atgv[1], mem, block_size, 1, "sorted_uid1.dat");
-    //disk_sort(atgv[1], mem, block_size, 2, "sorted_uid2.dat");
+    disk_sort(atgv[1], mem, block_size, 1, "sorted_uid1.dat");
+    disk_sort(atgv[1], mem, block_size, 2, "sorted_uid2.dat");
 
    // to do : scan sorted file uid1 and uid2, and calculate true friends;
    merge_sort_join(mem, block_size);

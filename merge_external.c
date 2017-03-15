@@ -232,7 +232,7 @@ int refill_buffer (MergeManager * manager, int file_number) {
 	char k[100];
 	sprintf(k,"%d",manager->input_file_numbers[file_number]);
 	char * filename = (char *) calloc(121,sizeof(char));
-	strcat(filename,"sorted");
+	strcat(filename,manager->input_prefix);
 	strcat(filename,k);
 	strcat(filename,".dat");
 	if (!(fp_read = fopen (filename , "rb" ))){

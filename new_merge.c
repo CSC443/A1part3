@@ -28,7 +28,7 @@ int new_merge_runs (New_MergeManager * merger){
         //     merger->current_input_file_positions[1] = 0;
         //     new_refill_buffer(merger,1);
         //  	new_get_next_input_element(merger,1,&r2);
-        if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1)){
+        if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1) && (r1.uid1 < r1.uid2)){
         	printf("find match\n");
         	merger->current_input_buffer_positions[0]++;
         	merger->current_input_buffer_positions[1]++;

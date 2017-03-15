@@ -7,7 +7,24 @@ select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A
 
 Run Time: real 812.041 user 657.192000 sys 139.692000
 
-
+total match 21776094
+real       160.44
+user        51.70
+sys         45.66
+1227120640  maximum resident set size
+         0  average shared memory size
+         0  average unshared data size
+         0  average unshared stack size
+   1077322  page reclaims
+         0  page faults
+         0  swaps
+        25  block input operations
+       103  block output operations
+         0  messages sent
+         0  messages received
+         0  signals received
+    438327  voluntary context switches
+    594326  involuntary context switches
 
 
 Query2:
