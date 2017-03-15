@@ -144,9 +144,9 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
                     perror("read buffer failed\n");
         }
         if(sort_uid == 2){
-            qsort (buffer, records_last_chunk, sizeof(Record), compare_uid2);
+            qsort (buffer, records_per_chunk, sizeof(Record), compare_uid2);
         }else{
-            qsort (buffer, records_last_chunk, sizeof(Record), compare_uid1);
+            qsort (buffer, records_per_chunk, sizeof(Record), compare_uid1);
         }
 //		qsort (buffer, records_per_chunk, sizeof(Record), compare);
 		fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
@@ -173,7 +173,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
  	int records_per_block  = block_size/sizeof(Record);
  	int block_num = mem/block_size;
  	int records_per_buffer = records_per_block * (block_num / (buffer_num + 1));
-
+    manager->sort_uid = sort_uid;
 
  	manager->heap_capacity = buffer_num;
  	manager->heap = (HeapElement *)calloc(buffer_num, sizeof(HeapElement));

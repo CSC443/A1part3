@@ -9,7 +9,7 @@ int new_merge_runs (New_MergeManager * merger){
 	//1. go in the loop through all input files and fill-in initial buffers
 	if (new_init_merge (merger)!=SUCCESS)
 		return FAILURE;
-
+	int i = 0;
     while (merger->current_input_file_positions[0] != -1 && merger->current_input_file_positions[1] != -1){
     	//printf("loop start\n");
     	Record r1;
@@ -28,7 +28,7 @@ int new_merge_runs (New_MergeManager * merger){
         //     merger->current_input_file_positions[1] = 0;
         //     new_refill_buffer(merger,1);
         //  	new_get_next_input_element(merger,1,&r2);
-        if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1) && (r1.uid1 <=r1.uid2)){
+        if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1)){
         	printf("find match\n");
         	merger->current_input_buffer_positions[0]++;
         	merger->current_input_buffer_positions[1]++;
@@ -36,7 +36,7 @@ int new_merge_runs (New_MergeManager * merger){
 			merger->output_buffer [merger->current_output_buffer_position].uid2=r1.uid2;
 		    merger->current_output_buffer_position++;
         	printf("record1:%d,%d  ,record2:%d,%d\n", r1.uid1,r1.uid2,r2.uid1,r2.uid2); 	
-
+        	i++;
             
 		    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 		    	printf("go go go\n");
@@ -45,14 +45,14 @@ int new_merge_runs (New_MergeManager * merger){
 					merger->current_output_buffer_position=0;
 				}	
 			}
-        }else if (r1.uid1 > r1.uid2) {
+        }else if (r1.uid1 < r2.uid2) {
         	    merger->current_input_buffer_positions[0]++;
         	    
-        } else if (r2.uid1 < r2.uid2){
+        } else if (r1.uid1 > r2.uid2){
         	    merger->current_input_buffer_positions[1]++;
         }
         else {
-        	if (r1.uid1 < r2.uid2){
+        	if (r1.uid2 < r2.uid1){
               merger->current_input_buffer_positions[0]++;
             } else{
               merger->current_input_buffer_positions[1]++;
@@ -60,6 +60,7 @@ int new_merge_runs (New_MergeManager * merger){
         }
 
     }
+    printf("total match %d\n", i);
 
 	//flush what remains in output buffer
 	if(merger->current_output_buffer_position > 0) {
