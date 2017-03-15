@@ -30,7 +30,7 @@ int merge_sort_join(int mem, int block_size){
     int records_per_buffer = (mem_per_block /3)*records_per_block * sizeof(Record);
 
     manager->input_buffer_capacity = records_per_buffer;
-    manager->output_buffer_capacity = records_per_buffer;
+    manager->output_buffer_capacity = records_per_buffer + (mem_per_block%3)*records_per_block * sizeof(Record);
     int current_input_file_positions[2];
     int current_input_buffer_positions[2];
     int total_input_buffer_elements[2];

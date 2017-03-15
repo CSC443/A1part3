@@ -7,6 +7,7 @@ select count(*) from followers as A join followers as B on A.uid1 = B.uid2 and A
 
 Run Time: real 812.041 user 657.192000 sys 139.692000
 
+
 total match 21776094
 real       160.44
 user        51.70
@@ -35,10 +36,19 @@ In Lab:
         System time (seconds): 4.74
         Percent of CPU this job got: 40%
         Elapsed (wall clock) time (h:mm:ss or m:ss): 1:29.82
+
+wolf:/s/csc443/yufangzh/A1P3/A1part3$ /usr/bin/time -v ./query1 data1.dat 16384
+total number match 21776094
+        Command being timed: "./query1 data1.dat 16384"
+        User time (seconds): 74.90
+        System time (seconds): 19.50
+        Percent of CPU this job got: 68%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 2:18.25
         Average shared text size (kbytes): 0
         Average unshared data size (kbytes): 0
         Average stack size (kbytes): 0
         Average total size (kbytes): 0
+
         Maximum resident set size (kbytes): 1263820
         Average resident set size (kbytes): 0
         Major (requiring I/O) page faults: 0
@@ -48,13 +58,26 @@ In Lab:
         Swaps: 0
         File system inputs: 1455704
         File system outputs: 5673512
+
+        Maximum resident set size (kbytes): 1265400
+        Average resident set size (kbytes): 0
+        Major (requiring I/O) page faults: 0
+        Minor (reclaiming a frame) page faults: 1402476
+        Voluntary context switches: 129446
+        Involuntary context switches: 11549
+        Swaps: 0
+        File system inputs: 0
+        File system outputs: 5673504
+
         Socket messages sent: 0
         Socket messages received: 0
         Signals delivered: 0
         Page size (bytes): 4096
         Exit status: 0
 
+
     
+
 
 
 Query2:
