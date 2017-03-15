@@ -91,7 +91,7 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger){
 int query1_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 	if ((r1->uid1==r2->uid2) && (r1->uid2 == r2->uid1) && (r1->uid1 < r1->uid2)){
     	//printf("find match\n");
-    	count++;
+    	*count = *count + 1;
     	merger->current_input_buffer_positions[0]++;
     	merger->current_input_buffer_positions[1]++;
     	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
