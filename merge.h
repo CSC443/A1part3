@@ -120,9 +120,9 @@ int new_refill_buffer (New_MergeManager * manager, int type);
 //8. Frees all dynamically allocated memory
 void new_clean_up (New_MergeManager * merger);
 
-int query2_join(Record r1, Record r2, New_MergeManager * merger);
+int query2_join(Record *r1, Record *r2, New_MergeManager * merger);
 
-int query1_join(Record r1, Record r2, New_MergeManager * merger);
+int query1_join(Record *r1, Record *r2, New_MergeManager * merger);
 
 
 

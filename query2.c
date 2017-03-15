@@ -18,12 +18,27 @@ int main (int argc, char *atgv[]){
    // to do : scan sorted file uid1 and uid2, and calculate true friends;
    merge_sort_join(mem, block_size);
    disk_sort("query2.dat", mem, block_size, 3, "sorted_query2.dat");
-   remove("query2.dat");
-   remove("sorted_uid2.dat");
-   remove("sorted_uid1.dat");
-   remove("outdegree.dat");
-   remove("indegree.dat");
+   
+   FILE *fp_read;
+   if (!(fp_read = fopen ( "sorted_query2.dat", "rb" ))){
+		return -1;
+	}
+	Record * buffer = (Record *) calloc (block_size, sizeof (Record));
+	int r = fread (buffer, sizeof(Record), block_size, fp_read);
+	int count= 0;
+	while (count<10){
+		printf("uid:%d , in-out:%d\n",buffer[count].uid1,buffer[count].uid2);
+	    count++;
+   }
+   fclose (fp_read);
+   free (buffer);
+  // remove("query2.dat");
+  // remove("sorted_uid2.dat");
+  // remove("sorted_uid1.dat");
+  // remove("outdegree.dat");
+  // remove("indegree.dat");
    return 0;
+   
 }
 
 int merge_sort_join(int mem, int block_size){

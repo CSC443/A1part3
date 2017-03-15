@@ -6,17 +6,18 @@ int new_merge_runs (New_MergeManager * merger){
 	printf("new_merge_runs start\n");
 	int result1; //stores SUCCESS/FAILURE returned at the end	
 	int result2;
+	
 	//1. go in the loop through all input files and fill-in initial buffers
 	if (new_init_merge (merger)!=SUCCESS)
 		return FAILURE;
+	Record *r1 = (Record *) calloc (1, sizeof (Record)) ;
+    Record *r2 = (Record *) calloc (1, sizeof (Record)) ;
     while (merger->current_input_file_positions[0] != -1 && merger->current_input_file_positions[1] != -1){
-    	//printf("loop start\n");
-    	Record r1;
-    	Record r2;
-        result1 = new_get_next_input_element(merger,0,&r1);
+        
+        result1 = new_get_next_input_element(merger,0,r1);
         if (result1==FAILURE)
 			return FAILURE;
-        result2 = new_get_next_input_element(merger,1,&r2); 
+        result2 = new_get_next_input_element(merger,1,r2); 
         if (result2==FAILURE)
 			return FAILURE;
 		if(merger->is_query1 == 0){
@@ -27,7 +28,8 @@ int new_merge_runs (New_MergeManager * merger){
         
 
     }
-
+	free(r1);
+	free(r2);
 	//flush what remains in output buffer
 	if(merger->current_output_buffer_position > 0) {
 		//printf("last buffer size%d uid1 %d uid2 %d\n", merger->current_output_buffer_position, merger->output_buffer[1].uid1, merger->output_buffer[1].uid2);
@@ -39,12 +41,12 @@ int new_merge_runs (New_MergeManager * merger){
 	return SUCCESS;	
 }
 
-int query2_join(Record r1, Record r2, New_MergeManager * merger){
-	if (r1.uid1==r2.uid1){
+int query2_join(Record *r1, Record *r2, New_MergeManager * merger){
+	if (r1->uid1==r2->uid1){
     	merger->current_input_buffer_positions[0]++;
     	merger->current_input_buffer_positions[1]++;
-    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1.uid1;
-		merger->output_buffer [merger->current_output_buffer_position].uid2=r2.uid2 - r1.uid2;
+    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
+		merger->output_buffer [merger->current_output_buffer_position].uid2=r2->uid2 - r1->uid2;
 	    merger->current_output_buffer_position++;
     	//printf("record1:%d,%d  ,record2:%d,%d\n", r1.uid1,r1.uid2,r2.uid1,r2.uid2); 	
     	
@@ -55,10 +57,10 @@ int query2_join(Record r1, Record r2, New_MergeManager * merger){
 				merger->current_output_buffer_position=0;
 			}	
 		}
-    }else if (r1.uid1 < r2.uid1) {
+    }else if (r1->uid1 < r2->uid1) {
     	merger->current_input_buffer_positions[0]++;
-    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1.uid1;
-		merger->output_buffer [merger->current_output_buffer_position].uid2= -r1.uid2;
+    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
+		merger->output_buffer [merger->current_output_buffer_position].uid2= -r1->uid2;
 	    merger->current_output_buffer_position++;
 	    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 			if(new_flush_output_buffer(merger)!=SUCCESS) {
@@ -67,11 +69,11 @@ int query2_join(Record r1, Record r2, New_MergeManager * merger){
 			}	
 		}
     	    
-    } else if (r1.uid1 > r2.uid1){
+    } else if (r1->uid1 > r2->uid1){
 
     	merger->current_input_buffer_positions[1]++;
-    	merger->output_buffer [merger->current_output_buffer_position].uid1=r2.uid1;
-		merger->output_buffer [merger->current_output_buffer_position].uid2= r2.uid2;
+    	merger->output_buffer [merger->current_output_buffer_position].uid1=r2->uid1;
+		merger->output_buffer [merger->current_output_buffer_position].uid2= r2->uid2;
 	    merger->current_output_buffer_position++;
 	    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 			if(new_flush_output_buffer(merger)!=SUCCESS) {
@@ -83,15 +85,15 @@ int query2_join(Record r1, Record r2, New_MergeManager * merger){
     return SUCCESS;	
 }
 
-int query1_join(Record r1, Record r2, New_MergeManager * merger){
-	if ((r1.uid1==r2.uid2) && (r1.uid2 == r2.uid1) && (r1.uid1 < r1.uid2)){
+int query1_join(Record *r1, Record *r2, New_MergeManager * merger){
+	if ((r1->uid1==r2->uid2) && (r1->uid2 == r2->uid1) && (r1->uid1 < r1->uid2)){
     	printf("find match\n");
     	merger->current_input_buffer_positions[0]++;
     	merger->current_input_buffer_positions[1]++;
-    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1.uid1;
-		merger->output_buffer [merger->current_output_buffer_position].uid2=r1.uid2;
+    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
+		merger->output_buffer [merger->current_output_buffer_position].uid2=r1->uid2;
 	    merger->current_output_buffer_position++;
-    	printf("record1:%d,%d  ,record2:%d,%d\n", r1.uid1,r1.uid2,r2.uid1,r2.uid2); 	
+    	printf("record1:%d,%d  ,record2:%d,%d\n", r1->uid1,r1->uid2,r2->uid1,r2->uid2); 	
         
 	    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 	    	printf("go go go\n");
@@ -100,14 +102,14 @@ int query1_join(Record r1, Record r2, New_MergeManager * merger){
 				merger->current_output_buffer_position=0;
 			}	
 		}
-    }else if (r1.uid1 < r2.uid2) {
+    }else if (r1->uid1 < r2->uid2) {
     	    merger->current_input_buffer_positions[0]++;
     	    
-    } else if (r1.uid1 > r2.uid2){
+    } else if (r1->uid1 > r2->uid2){
     	    merger->current_input_buffer_positions[1]++;
     }
     else {
-    	if (r1.uid2 < r2.uid1){
+    	if (r1->uid2 < r2->uid1){
           merger->current_input_buffer_positions[0]++;
         } else{
           merger->current_input_buffer_positions[1]++;
@@ -184,9 +186,11 @@ int new_get_next_input_element(New_MergeManager * manager, int type, Record *res
 }
 
 int new_refill_buffer (New_MergeManager * manager, int type) {
-	FILE *fp_read;
+	
+	
 
 	if(type == 0){
+		FILE *fp_read;
 		if (!(fp_read = fopen (manager->input_file_name_1, "rb" ))){
 			return FAILURE;
 			
@@ -199,8 +203,10 @@ int new_refill_buffer (New_MergeManager * manager, int type) {
 			manager->current_input_file_positions[0] +=  result;
 			manager->total_input_buffer_elements[0] = result;		
 		}
+		fclose(fp_read);
 	}
 	if(type == 1){
+		FILE *fp_read;
 		if (!(fp_read = fopen (manager->input_file_name_2, "rb" ))){
 			return FAILURE;
 			
@@ -213,10 +219,9 @@ int new_refill_buffer (New_MergeManager * manager, int type) {
 			manager->current_input_file_positions[1] +=  result;
 			manager->total_input_buffer_elements[1] = result;		
 		}
+		fclose(fp_read);
 	}
 		
-    fclose(fp_read);
-	
 	return SUCCESS;
 }
 
