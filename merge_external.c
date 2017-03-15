@@ -1,5 +1,4 @@
 #include "merge.h"
-#include "record.h"
 
 //manager fields should be already initialized in the caller
 int merge_runs (MergeManager * merger){	
@@ -250,5 +249,10 @@ int compare_heap_elements (HeapElement *a, HeapElement *b) {
 	if(a->UID2 > b->UID2){
 		return 1;
 	}
+    if(a->UID2 == b->UID2){
+        if(a->UID1 > b->UID1){
+            return 1;
+        }
+    }
 	return 0;
 }

@@ -1,10 +1,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "record.h"
 #include "merge.h"
+#include "disk.h"
+#include "record.h"
 
-int merge_sort(int buffer_num, int mem, int block_size);
+
 /**
 * Compares two records a and b 
 * with respect to the value of the integer field f.
@@ -13,19 +14,43 @@ int merge_sort(int buffer_num, int mem, int block_size);
 * negative: record a < record b
 * zero: equal records
 */
-int compare (const void *a, const void *b) {
+int compare_uid2 (const void *a, const void *b) {
  int a_uid2 = ((const struct record*)a)->uid2;
- int b_uid2= ((const struct record*)b)->uid2;
- return (a_uid2 - b_uid2);
+    int b_uid2= ((const struct record*)b)->uid2;
+    int a_uid1 = ((const struct record*)a)->uid1;
+    int b_uid1= ((const struct record*)b)->uid1;
+    if(a_uid2 - b_uid2 == 0){
+        return (a_uid1 - b_uid1);
+    }
+    return (a_uid2 - b_uid2);
+
 }
 
+int compare_uid1 (const void *a, const void *b) {
+ int a_uid2 = ((const struct record*)a)->uid2;
+    int b_uid2= ((const struct record*)b)->uid2;
+    int a_uid1 = ((const struct record*)a)->uid1;
+    int b_uid1= ((const struct record*)b)->uid1;
+    if(a_uid1 - b_uid1 == 0){
+        return (a_uid2 - b_uid2);
+    }
+    return (a_uid1 - b_uid1);
 
-int main(int argc, char *atgv[]){
+}
+
+// int main(int argc, char *atgv[]){
+//     int block_size = atoi(atgv[3]);
+//     int mem = atoi(atgv[2]);
+//     disk_sort(atgv[1], mem, block_size, atoi(atgv[4]), atgv[5]);
+// }
+
+int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* output_filename){
  	//printf("start disk_sort\n");
  	//FILE *fp_write;
  	FILE *fp_read;
-    int block_size = atoi(atgv[3]);
-    int mem = atoi(atgv[2]);
+    // int block_size = atoi(atgv[3]);
+    // int mem = atoi(atgv[2]);
+    // int sort_uid = atoi(atgv[4]);
     
     int block_num= (mem/block_size);
     //printf("%d,%d\n", mem,block_size);
@@ -33,7 +58,7 @@ int main(int argc, char *atgv[]){
     //printf("size of record:%d\n",sizeof(Record));
     //int num_records = mem / sizeof(Record);
 
-	if (!(fp_read = fopen (atgv[1] , "rb" ))){
+	if (!(fp_read = fopen (filename , "rb" ))){
 		return -1;
 	}	
 
@@ -74,8 +99,14 @@ int main(int argc, char *atgv[]){
 		sprintf(k,"%d",run);
 		char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
 		//printf("%s\n",filename );
-		strcat(filename,"sorted");
-		strcat(filename,k);
+        if(sort_uid == 1){
+            strcat(filename,"sorted1_");
+        }else{
+            strcat(filename,"sorted2_");
+        }
+
+		strcat(filename,k);        
+        
 		strcat(filename,".dat");
 		//printf("%s\n",filename );
 		//printf("%s\n",strcat(strcat("sorted",k), ".dat") );
@@ -94,7 +125,12 @@ int main(int argc, char *atgv[]){
                 if (r1==0){
                     perror("read buffer failed\n");
                 }
-				qsort (buffer, records_last_chunk, sizeof(Record), compare);
+                if(sort_uid == 2){
+                    qsort (buffer, records_last_chunk, sizeof(Record), compare_uid2);
+                }else{
+                    qsort (buffer, records_last_chunk, sizeof(Record), compare_uid1);
+                }
+				
 				fwrite(buffer, sizeof(Record), records_last_chunk, fp_write);
 				fflush (fp_write);
                 free (buffer);
@@ -107,7 +143,12 @@ int main(int argc, char *atgv[]){
 		if (r==0){
                     perror("read buffer failed\n");
         }
-		qsort (buffer, records_per_chunk, sizeof(Record), compare);
+        if(sort_uid == 2){
+            qsort (buffer, records_last_chunk, sizeof(Record), compare_uid2);
+        }else{
+            qsort (buffer, records_last_chunk, sizeof(Record), compare_uid1);
+        }
+//		qsort (buffer, records_per_chunk, sizeof(Record), compare);
 		fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
 		fflush (fp_write);
 
@@ -121,12 +162,12 @@ int main(int argc, char *atgv[]){
 
    }
    fclose(fp_read);
-   merge_sort(num_sublist+1, mem, block_size);
+   merge_sort(num_sublist+1, mem, block_size, output_filename, sort_uid);
    return 0;
    
  }
 
- int merge_sort(int buffer_num, int mem, int block_size){
+ int merge_sort(int buffer_num, int mem, int block_size, char* output_filename, int sort_uid){
  	MergeManager * manager = (MergeManager *)calloc(1, sizeof(MergeManager));
 
  	int records_per_block  = block_size/sizeof(Record);
@@ -136,8 +177,13 @@ int main(int argc, char *atgv[]){
 
  	manager->heap_capacity = buffer_num;
  	manager->heap = (HeapElement *)calloc(buffer_num, sizeof(HeapElement));
- 	strcpy(manager->output_file_name , "sorted_merge.dat");
- 	strcpy(manager->input_prefix, "sorted");
+ 	strcpy(manager->output_file_name , output_filename);
+    if(sort_uid == 1){
+        strcpy(manager->input_prefix, "sorted1_");
+    }else{
+        strcpy(manager->input_prefix, "sorted2_"); 
+    } 
+ 	
  	if(block_num % (buffer_num + 1) > 0){
  		int extra_block = block_num % (buffer_num + 1);
  		manager->output_buffer_capacity = records_per_buffer + extra_block * records_per_block;

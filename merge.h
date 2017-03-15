@@ -73,7 +73,8 @@ int compare_heap_elements (HeapElement *a, HeapElement *b);
 typedef struct new_merge_manager {
 	//HeapElement *heap;  //keeps 1 from each buffer in top-down order - smallest on top (according to compare function)	
 	FILE *inputFP; //stays closed, opens each time we need to reupload some amount of data from disk runs
-	int *input_file_numbers;  //we need to know the run id to read from the corresponding run	
+	char input_file_name_1 [MAX_PATH_LENGTH];  //we need to know the run id to read from the corresponding run
+    char input_file_name_2 [MAX_PATH_LENGTH];
 	FILE *outputFP; //flushes output from output buffer 
 	Record *output_buffer; //buffer to store output elements until they are flushed to disk
 	int current_output_buffer_position;  //where to add element in the output buffer
@@ -87,8 +88,6 @@ typedef struct new_merge_manager {
 	//int current_heap_size;
 	int heap_capacity;  //corresponds to the total number of runs (input buffers)
 	char output_file_name [MAX_PATH_LENGTH]; //stores name of the file to which to write the final output
-	char input_prefix1 [MAX_PATH_LENGTH]; //stores the prefix of a path to each run - to concatenate with run id and to read the file
-	char input_prefix2 [MAX_PATH_LENGTH]; 
 }New_MergeManager;
 
 //1. main loop
@@ -107,10 +106,10 @@ int new_flush_output_buffer (New_MergeManager * manager);
 //int new_insert_into_heap (New_MergeManager * manager, int run_id, Record *input);
 
 //6. reads next element from an input buffer to transfer it to the heap. Uploads records from disk if all elements are processed
-int new_get_next_input_element(New_MergeManager * manager, int file_number,int type, Record *result); 
+int new_get_next_input_element(New_MergeManager * manager,int type, Record *result); 
 
 //7. refills input buffer from the corresponding run
-int new_refill_buffer (New_MergeManager * manager, int file_number , int type);
+int new_refill_buffer (New_MergeManager * manager, int type);
 
 //8. Frees all dynamically allocated memory
 void new_clean_up (New_MergeManager * merger);
