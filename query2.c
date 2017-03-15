@@ -23,8 +23,18 @@ int main (int argc, char *atgv[]){
    if (!(fp_read = fopen ( "sorted_query2.dat", "rb" ))){
 		return -1;
 	}
+
+  fseek(fp_read, 0L, SEEK_END);
+  int file_size = ftell(fp_read);
+  fseek(fp_read, 0L, SEEK_SET);
+
+  printf("distinct user number: %lu\n", file_size/sizeof(Record));
 	Record * buffer = (Record *) calloc (block_size, sizeof (Record));
+
 	int r = fread (buffer, sizeof(Record), block_size, fp_read);
+  if(r == 0){
+    return -1;
+  }
 	int count= 0;
 	while (count<10){
 		printf("uid:%d , in-out:%d\n",buffer[count].uid1,buffer[count].uid2);
