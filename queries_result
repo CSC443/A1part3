@@ -16,6 +16,19 @@ In Lab:
         System time (seconds): 4.74
         Percent of CPU this job got: 40%
         Elapsed (wall clock) time (h:mm:ss or m:ss): 1:29.82
+	
+	
+b2210-05:/s/csc443/xieyu1/A1part3$ /usr/bin/time -v query1 data.dat 16384 
+total number match 21776094
+        Command being timed: "query1 data.dat 16384"
+        User time (seconds): 20.02
+        System time (seconds): 3.55
+        Percent of CPU this job got: 30%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 1:18.29
+	
+	
+	
+	
 
 wolf:/s/csc443/yufangzh/A1P3/A1part3$ /usr/bin/time -v ./query1 data1.dat 16384
 total number match 21776094
@@ -134,5 +147,21 @@ uid:3403 , in-out:97931
         Page size (bytes): 4096
         Exit status: 0
 
+distinct user number: 11316811                                         
+uid:5994113 , in-out:564220                                           
+uid:7496 , in-out:344850                                            
+uid:1349110 , in-out:340491
+uid:1629776 , in-out:170111
+uid:8121005 , in-out:155933
+uid:2041453 , in-out:152069
+uid:797152 , in-out:118752
+uid:6623784 , in-out:115819
+uid:645019 , in-out:107639
+uid:3403 , in-out:97931
+        Command being timed: "query2 data.dat 16384"
+        User time (seconds): 21.00
+        System time (seconds): 3.80
+        Percent of CPU this job got: 29%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 1:23.63
 
 
