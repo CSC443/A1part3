@@ -24,11 +24,6 @@ int main (int argc, char *atgv[]){
 		return -1;
 	}
 
-  fseek(fp_read, 0L, SEEK_END);
-  int file_size = ftell(fp_read);
-  fseek(fp_read, 0L, SEEK_SET);
-
-  printf("distinct user number: %lu\n", file_size/sizeof(Record));
 	Record * buffer = (Record *) calloc (block_size, sizeof (Record));
 
 	int r = fread (buffer, sizeof(Record), block_size, fp_read);
