@@ -109,15 +109,22 @@ int query1_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 	while (merger->current_input_file_positions[0] != -1 && merger->current_input_file_positions[1] != -1){
         if(merger->current_input_file_positions[0] != -1){
         	result1 = new_get_next_input_element(merger,0,r1);
+        }else{
+        	result1 = EMPTY;
         }
         
         if (result1==FAILURE)
 			return FAILURE;
         if(merger->current_input_file_positions[1] != -1){
         	result2 = new_get_next_input_element(merger,1,r2);
+        }else{
+        	result2 = EMPTY;
         }
         if (result2==FAILURE)
 			return FAILURE;
+		if(result1 == EMPTY && result2 == EMPTY){
+			break;
+		}
 		if ((r1->uid1==r2->uid2) && (r1->uid2 == r2->uid1) && (r1->uid1 < r1->uid2)){
 	    	//printf("find match\n");
 	    	*count = *count + 1;
