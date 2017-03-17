@@ -165,3 +165,17 @@ uid:3403 , in-out:97931
         Elapsed (wall clock) time (h:mm:ss or m:ss): 1:23.63
 
 
+
+sqlite> select c.uid, sum(c.co) as s from (select A.uid1 as uid,-count(*) as co from followers as A group by A.uid1 UNION select B.uid2 as uid, count(*) as co from followers as B group by B.uid2) c group by c.uid order by s DESC limit 10;                                 
+5994113|564220                 
+7496|344850              
+1349110|340491              
+1629776|170111              
+8121005|155933              
+2041453|152069                
+797152|118752                       
+6623784|115819                            
+645019|107639                           
+3403|97931                                                                                                                                                                                                                                                                     
+Run Time: real 216.425 user 199.192000 sys 10.260000     
+
