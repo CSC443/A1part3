@@ -1,5 +1,5 @@
 #include "merge.h"
-#include "Record.h"
+#include "record.h"
 
 //manager fields should be already initialized in the caller
 int q2_merge_runs (Q2MergeManager * merger){	

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "merge.h"
 #include "disk.h"
-#include "Record.h"
+#include "record.h"
 
 
 /**
