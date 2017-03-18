@@ -91,7 +91,7 @@ typedef struct new_merge_manager {
 
 	int *total_input_buffer_elements;  //number of actual elements currently in input buffer - can be less than max capacity
 	//int current_heap_size;
-	int heap_capacity;  //corresponds to the total number of runs (input buffers)
+	//int heap_capacity;  //corresponds to the total number of runs (input buffers)
 	char output_file_name [MAX_PATH_LENGTH]; //stores name of the file to which to write the final output
 	int is_query1;
 }New_MergeManager;

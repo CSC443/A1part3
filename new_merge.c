@@ -80,12 +80,12 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 				}	
 			}
 		}else if (r1->uid1==r2->uid1){
+		
 	    	merger->current_input_buffer_positions[0]++;
 	    	merger->current_input_buffer_positions[1]++;
 	    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
 			merger->output_buffer [merger->current_output_buffer_position].uid2=r2->uid2 - r1->uid2;
 		    merger->current_output_buffer_position++;
-	    	//printf("record1:%d,%d  ,record2:%d,%d\n", r1.uid1,r1.uid2,r2.uid1,r2.uid2); 	
 	    	
 	        
 		    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {

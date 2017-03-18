@@ -301,6 +301,7 @@ void clean_up (MergeManager * merger) {
 		strcat(filename,".dat");
 		//printf("%s\n",filename );
 		remove(filename);
+		free(filename);
 	}
 	free(merger->input_buffers);
 	//printf("2\n");
