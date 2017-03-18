@@ -11,6 +11,13 @@ typedef struct record {
 	int uid2;
 } Record;
 
+typedef struct q2_record {
+	int uid1;
+	int count;
+	int indegree;
+	int outdegree;
+} Q2Record;
+
 void csv_to_record(char* filename, char* block_size);
 
 void write_buffer_to_disk(Record* buffer, int total_records, FILE *fp);

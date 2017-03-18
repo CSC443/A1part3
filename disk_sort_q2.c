@@ -3,41 +3,28 @@
 #include <stdio.h>
 #include "merge.h"
 #include "disk.h"
-#include "record.h"
+#include "Record.h"
 
 
 /**
 * Compares two records a and b 
 * with respect to the value of the integer field f.
 * Returns an integer which indicates relative order: 
-* positive: record a > record b
-* negative: record a < record b
+* positive: Q2Record a > Q2Record b
+* negative: Q2Record a < Q2Record b
 * zero: equal records
 */
-int compare_uid2 (const void *a, const void *b) {
- int a_uid2 = ((const struct record*)a)->uid2;
-    int b_uid2= ((const struct record*)b)->uid2;
-    int a_uid1 = ((const struct record*)a)->uid1;
-    int b_uid1= ((const struct record*)b)->uid1;
-    if(a_uid2 - b_uid2 == 0){
-        return (a_uid1 - b_uid1);
+
+
+int compare_celebrity(const void *a, const void *b) {
+    int a_count = ((const struct q2_record*)a)->count;
+    int b_count = ((const struct q2_record*)b)->count;
+    if(b_count > a_count){
+        return 1;
     }
-    return (a_uid2 - b_uid2);
+    return -1;
 
 }
-
-int compare_uid1 (const void *a, const void *b) {
- int a_uid2 = ((const struct record*)a)->uid2;
-    int b_uid2= ((const struct record*)b)->uid2;
-    int a_uid1 = ((const struct record*)a)->uid1;
-    int b_uid1= ((const struct record*)b)->uid1;
-    if(a_uid1 - b_uid1 == 0){
-        return (a_uid2 - b_uid2);
-    }
-    return (a_uid1 - b_uid1);
-
-}
-
 
 // int main(int argc, char *atgv[]){
 //     int block_size = atoi(atgv[3]);
@@ -45,7 +32,7 @@ int compare_uid1 (const void *a, const void *b) {
 //     disk_sort(atgv[1], mem, block_size, atoi(atgv[4]), atgv[5]);
 // }
 
-int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* output_filename){
+int disk_sort_q2(char* filename, int mem, int block_size, char* output_filename){
 
  	FILE *fp_read;
     
@@ -58,14 +45,14 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 	// find file size
     fseek(fp_read, 0L, SEEK_END);
 	int file_size = ftell(fp_read);
-    int records_per_block = block_size/sizeof(Record);
+    int records_per_block = block_size/sizeof(Q2Record);
 	int chunk_num = file_size/mem;
     int last_chunk_size = file_size - chunk_num*mem;
     int records_per_chunk = records_per_block*block_num;
-    int records_last_chunk = last_chunk_size/sizeof(Record);
+    int records_last_chunk = last_chunk_size/sizeof(Q2Record);
     int num_sublist;
     //printf("records_per_chunk:%d\n",records_per_chunk);
-    //printf("size of record is %lu\n" , sizeof(Record));
+    //printf("size of Q2Record is %lu\n" , sizeof(Q2Record));
     if (last_chunk_size!=0){
     	num_sublist = chunk_num;
 
@@ -85,11 +72,8 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 		sprintf(k,"%d",run);
 		char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
 		//printf("%s\n",filename );
-        if(sort_uid == 1){
-            strcat(filename,"sorted1_");
-        }else if(sort_uid == 2){
-            strcat(filename,"sorted2_");
-        }
+
+        strcat(filename,"sorted3_");
 
 		strcat(filename,k);        
         
@@ -106,36 +90,32 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
                    break;
 
         	}else{
-        		Record * buffer = (Record *) calloc (records_last_chunk, sizeof (Record));
-        		int r1 = fread (buffer, sizeof(Record), records_last_chunk, fp_read);
+        		Q2Record * buffer = (Q2Record *) calloc (records_last_chunk, sizeof (Q2Record));
+        		int r1 = fread (buffer, sizeof(Q2Record), records_last_chunk, fp_read);
                 if (r1==0){
                     perror("read buffer failed\n");
                 }
-                if(sort_uid == 2){
-                    qsort (buffer, records_last_chunk, sizeof(Record), compare_uid2);
-                }else if(sort_uid == 1){
-                    qsort (buffer, records_last_chunk, sizeof(Record), compare_uid1);
-                }
 
-				fwrite(buffer, sizeof(Record), records_last_chunk, fp_write);
+                qsort (buffer, records_last_chunk, sizeof(Q2Record), compare_celebrity);
+                
+
+				fwrite(buffer, sizeof(Q2Record), records_last_chunk, fp_write);
 				fflush (fp_write);
                 free (buffer);
         	}            
         }
         else{
-		Record * buffer = (Record *) calloc (records_per_chunk, sizeof (Record));
+		Q2Record * buffer = (Q2Record *) calloc (records_per_chunk, sizeof (Q2Record));
 		//printf("run 1 is %d\n", run );
-		int r = fread (buffer, sizeof(Record), records_per_chunk, fp_read);
+		int r = fread (buffer, sizeof(Q2Record), records_per_chunk, fp_read);
 		if (r==0){
                     perror("read buffer failed\n");
         }
-        if(sort_uid == 2){
-            qsort (buffer, records_per_chunk, sizeof(Record), compare_uid2);
-        }else if(sort_uid == 1){
-            qsort (buffer, records_per_chunk, sizeof(Record), compare_uid1);
-        }
-//		qsort (buffer, records_per_chunk, sizeof(Record), compare);
-		fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
+
+        qsort (buffer, records_per_chunk, sizeof(Q2Record), compare_celebrity);
+        
+//		qsort (buffer, records_per_chunk, sizeof(Q2Record), compare);
+		fwrite(buffer, sizeof(Q2Record), records_per_chunk, fp_write);
 		fflush (fp_write);
 
 		free(buffer);
@@ -148,28 +128,24 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 
    }
    fclose(fp_read);
-   merge_sort(num_sublist+1, mem, block_size, output_filename, sort_uid);
+   merge_sort_q2(num_sublist+1, mem, block_size, output_filename);
    return 0;
    
  }
 
- int merge_sort(int buffer_num, int mem, int block_size, char* output_filename, int sort_uid){
+ int merge_sort_q2(int buffer_num, int mem, int block_size, char* output_filename){
     //printf("merge\n");
- 	MergeManager * manager = (MergeManager *)calloc(1, sizeof(MergeManager));
+ 	Q2MergeManager * manager = (Q2MergeManager *)calloc(1, sizeof(Q2MergeManager));
 
- 	int records_per_block  = block_size/sizeof(Record);
+ 	int records_per_block  = block_size/sizeof(Q2Record);
  	int block_num = mem/block_size;
  	int records_per_buffer = records_per_block * (block_num / (buffer_num + 1));
-    manager->sort_uid = sort_uid;
 
  	manager->heap_capacity = buffer_num;
- 	manager->heap = (HeapElement *)calloc(buffer_num, sizeof(HeapElement));
+ 	manager->heap = (Q2HeapElement *)calloc(buffer_num, sizeof(Q2HeapElement));
  	strcpy(manager->output_file_name , output_filename);
-    if(sort_uid == 1){
-        strcpy(manager->input_prefix, "sorted1_");
-    }else if(sort_uid == 2){
-        strcpy(manager->input_prefix, "sorted2_"); 
-    } 
+
+    strcpy(manager->input_prefix, "sorted3_"); 
  	
  	if(block_num % (buffer_num + 1) > 0){
  		int extra_block = block_num % (buffer_num + 1);
@@ -184,22 +160,22 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
  	int current_input_file_positions[buffer_num];
  	int current_input_buffer_positions[buffer_num];
  	int total_input_buffer_elements[buffer_num];
- 	Record** input_buffers = malloc(buffer_num * sizeof(Record *));
+ 	Q2Record** input_buffers = malloc(buffer_num * sizeof(Q2Record *));
  	int i;
  	for(i = 0; i < manager->heap_capacity; i++){
  		input_file_numbers[i] = i;
  		current_input_file_positions[i] = 0;
  		current_input_buffer_positions[i] = 0;
  		total_input_buffer_elements[i] = 0;
- 		input_buffers[i] = (Record *)calloc(manager->input_buffer_capacity, sizeof(Record));
+ 		input_buffers[i] = (Q2Record *)calloc(manager->input_buffer_capacity, sizeof(Q2Record));
  	}	
  	manager->input_file_numbers = input_file_numbers;
- 	manager->output_buffer = (Record *)calloc(manager->output_buffer_capacity, sizeof(Record));
+ 	manager->output_buffer = (Q2Record *)calloc(manager->output_buffer_capacity, sizeof(Q2Record));
  	manager->current_output_buffer_position = 0;
  	manager->input_buffers = input_buffers;
  	manager->current_input_file_positions = current_input_file_positions;
  	manager->current_input_buffer_positions = current_input_buffer_positions;
  	manager->total_input_buffer_elements = total_input_buffer_elements;
- 	merge_runs(manager);
+ 	q2_merge_runs(manager);
  	return 0;
  }

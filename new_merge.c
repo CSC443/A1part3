@@ -59,8 +59,10 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 		}
 		if(merger->current_input_file_positions[0] == -1 || r1->uid1 > r2->uid1){
 			merger->current_input_buffer_positions[1]++;
-	    	merger->output_buffer [merger->current_output_buffer_position].uid1=r2->uid1;
-			merger->output_buffer [merger->current_output_buffer_position].uid2= r2->uid2;
+	    	merger->output_buffer_q2 [merger->current_output_buffer_position].uid1=r2->uid1;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].count= r2->uid2;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].indegree = r2->uid2;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].outdegree = 0;
 		    merger->current_output_buffer_position++;
 		    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 				if(new_flush_output_buffer(merger)!=SUCCESS) {
@@ -70,8 +72,10 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 			}
 		}else if(merger->current_input_file_positions[1] == -1 || r1->uid1 < r2->uid1){
 			merger->current_input_buffer_positions[0]++;
-	    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
-			merger->output_buffer [merger->current_output_buffer_position].uid2= -r1->uid2;
+	    	merger->output_buffer_q2 [merger->current_output_buffer_position].uid1=r1->uid1;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].count= -r1->uid2;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].indegree = 0;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].outdegree = r1->uid2;
 		    merger->current_output_buffer_position++;
 		    if(merger->current_output_buffer_position == merger-> output_buffer_capacity ) {
 				if(new_flush_output_buffer(merger)!=SUCCESS) {
@@ -80,11 +84,15 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 				}	
 			}
 		}else if (r1->uid1==r2->uid1){
-		
+			if(r1->uid1 == 5994113){
+				printf("in %d out %d\n", r2->uid2, r1->uid2);
+			}
 	    	merger->current_input_buffer_positions[0]++;
 	    	merger->current_input_buffer_positions[1]++;
-	    	merger->output_buffer [merger->current_output_buffer_position].uid1=r1->uid1;
-			merger->output_buffer [merger->current_output_buffer_position].uid2=r2->uid2 - r1->uid2;
+	    	merger->output_buffer_q2 [merger->current_output_buffer_position].uid1=r1->uid1;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].count=r2->uid2 - r1->uid2;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].indegree = r2->uid2;
+			merger->output_buffer_q2 [merger->current_output_buffer_position].outdegree = r1->uid2;
 		    merger->current_output_buffer_position++;
 	    	
 	        
@@ -205,7 +213,12 @@ int new_flush_output_buffer (New_MergeManager * manager) {
 		return FAILURE;
 	}
 	//fseek(fp_write, 0L, SEEK_END);
-	fwrite(manager->output_buffer, sizeof(Record), manager->current_output_buffer_position, fp_write);
+	if(manager->is_query1 == 0){
+		fwrite(manager->output_buffer, sizeof(Record), manager->current_output_buffer_position, fp_write);
+	}else{
+		fwrite(manager->output_buffer_q2, sizeof(Q2Record), manager->current_output_buffer_position, fp_write);
+	}
+	
 	fflush (fp_write);
 	fclose(fp_write);
 	manager->current_output_buffer_position = 0;
@@ -279,7 +292,12 @@ void new_clean_up (New_MergeManager * merger) {
 	}
 	free(merger->input_buffers);
 	//printf("2\n");
-	free(merger->output_buffer);
+	if(merger->is_query1 == 0){
+		free(merger->output_buffer);
+	}else{
+		free(merger->output_buffer_q2);
+	}
+	
 	//printf("3\n");
 	free(merger);
 	//printf("4\n");

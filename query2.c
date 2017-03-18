@@ -17,22 +17,21 @@ int main (int argc, char *atgv[]){
     write_degree("sorted_uid2.dat", block_size, 1, "indegree.dat");
    // to do : scan sorted file uid1 and uid2, and calculate true friends;
    merge_sort_join(mem, block_size);
-   disk_sort("query2.dat", mem, block_size, 3, "sorted_query2.dat");
+   disk_sort_q2("query2.dat", mem, block_size, "sorted_query2.dat");
    
    FILE *fp_read;
    if (!(fp_read = fopen ( "sorted_query2.dat", "rb" ))){
 		return -1;
 	}
+	Q2Record * buffer = (Q2Record *) calloc (block_size, sizeof (Q2Record));
 
-	Record * buffer = (Record *) calloc (block_size, sizeof (Record));
-
-	int r = fread (buffer, sizeof(Record), block_size, fp_read);
+	int r = fread (buffer, sizeof(Q2Record), block_size, fp_read);
   if(r == 0){
     return -1;
   }
 	int count= 0;
 	while (count<10){
-		printf("uid:%d , in-out:%d\n",buffer[count].uid1,buffer[count].uid2);
+		  printf("uid: %d , in-out: %d, indegree: %d, outdegree: %d\n",buffer[count].uid1,buffer[count].count, buffer[count].indegree, buffer[count].outdegree);
 	    count++;
    }
    fclose (fp_read);
@@ -52,9 +51,11 @@ int merge_sort_join(int mem, int block_size){
     int records_per_block  = block_size/sizeof(Record);
     int mem_per_block = mem/block_size;
     int records_per_buffer = (mem_per_block/3)*records_per_block * sizeof(Record);
+    int q2_records_per_block = block_size/sizeof(Q2Record);
+    int q2_records_per_buffer = (mem_per_block/3)*q2_records_per_block*sizeof(Q2Record);
 
     manager->input_buffer_capacity = records_per_buffer;
-    manager->output_buffer_capacity = records_per_buffer + (mem_per_block%3)*records_per_block * sizeof(Record);
+    manager->output_buffer_capacity = q2_records_per_buffer;
     int current_input_file_positions[2];
     int current_input_buffer_positions[2];
     int total_input_buffer_elements[2];
@@ -69,7 +70,7 @@ int merge_sort_join(int mem, int block_size){
         total_input_buffer_elements[i] = 0;
         input_buffers[i] = (Record *)calloc(manager->input_buffer_capacity, sizeof(Record));
     }   
-    manager->output_buffer = (Record *)calloc(manager->output_buffer_capacity, sizeof(Record));
+    manager->output_buffer_q2 = (Q2Record *)calloc(manager->output_buffer_capacity, sizeof(Q2Record));
     manager->current_output_buffer_position = 0;
     manager->input_buffers = input_buffers;
     manager->current_input_file_positions = current_input_file_positions;

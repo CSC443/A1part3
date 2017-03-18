@@ -9,7 +9,7 @@ CFLAGS += -D_FILE_OFFSET_BITS=64
 NEW_MERGER = record.c new_merge.c
 QUERY1 = disk_sort.c record.c new_merge.c merge_external.c query1.c
 READ_BLOCKS_SRC= record.c read_blocks_seq.c
-QUERY2 = write_degree_block.c disk_sort.c record.c new_merge.c merge_external.c query2.c
+QUERY2 = write_degree_block.c disk_sort.c disk_sort_q2.c q2_merge_external.c record.c new_merge.c merge_external.c query2.c
 
 # Binaries
 all:query1 read_blocks_seq query2
