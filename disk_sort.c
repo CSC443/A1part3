@@ -64,8 +64,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
     int records_per_chunk = records_per_block*block_num;
     int records_last_chunk = last_chunk_size/sizeof(Record);
     int num_sublist;
-    //printf("records_per_chunk:%d\n",records_per_chunk);
-    //printf("size of record is %lu\n" , sizeof(Record));
+
     if (last_chunk_size!=0){
     	num_sublist = chunk_num;
 
@@ -84,7 +83,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
     	char k[chunk_num+1];
 		sprintf(k,"%d",run);
 		char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
-		//printf("%s\n",filename );
         if(sort_uid == 1){
             strcat(filename,"sorted1_");
         }else if(sort_uid == 2){
@@ -94,8 +92,7 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
 		strcat(filename,k);        
         
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
-		//printf("%s\n",strcat(strcat("sorted",k), ".dat") );
+
 		fp_write = fopen(filename, "wb");
 		if(fp_write == NULL){
 	 	     perror("Error opening file");
@@ -124,7 +121,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
         }
         else{
 		Record * buffer = (Record *) calloc (records_per_chunk, sizeof (Record));
-		//printf("run 1 is %d\n", run );
 		int r = fread (buffer, sizeof(Record), records_per_chunk, fp_read);
 		if (r==0){
                     perror("read buffer failed\n");
@@ -134,7 +130,6 @@ int disk_sort(char* filename, int mem, int block_size, int sort_uid, char* outpu
         }else if(sort_uid == 1){
             qsort (buffer, records_per_chunk, sizeof(Record), compare_uid1);
         }
-//		qsort (buffer, records_per_chunk, sizeof(Record), compare);
 		fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
 		fflush (fp_write);
 

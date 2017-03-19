@@ -46,7 +46,6 @@ int main (int argc, char *atgv[]){
 }
 
 int merge_sort_join(int mem, int block_size){
-    //printf("%s\n","start meger join" );
     New_MergeManager * manager = (New_MergeManager *)calloc(1, sizeof(New_MergeManager));
     int records_per_block  = block_size/sizeof(Record);
     int mem_per_block = mem/block_size;

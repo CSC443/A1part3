@@ -51,8 +51,6 @@ int disk_sort_q2(char* filename, int mem, int block_size, char* output_filename)
     int records_per_chunk = records_per_block*block_num;
     int records_last_chunk = last_chunk_size/sizeof(Q2Record);
     int num_sublist;
-    //printf("records_per_chunk:%d\n",records_per_chunk);
-    //printf("size of Q2Record is %lu\n" , sizeof(Q2Record));
     if (last_chunk_size!=0){
     	num_sublist = chunk_num;
 
@@ -71,15 +69,13 @@ int disk_sort_q2(char* filename, int mem, int block_size, char* output_filename)
     	char k[chunk_num+1];
 		sprintf(k,"%d",run);
 		char * filename = (char *) calloc(20+chunk_num+1,sizeof(char));
-		//printf("%s\n",filename );
 
         strcat(filename,"sorted3_");
 
 		strcat(filename,k);        
         
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
-		//printf("%s\n",strcat(strcat("sorted",k), ".dat") );
+
 		fp_write = fopen(filename, "wb");
 		if(fp_write == NULL){
 	 	     perror("Error opening file");
@@ -106,7 +102,6 @@ int disk_sort_q2(char* filename, int mem, int block_size, char* output_filename)
         }
         else{
 		Q2Record * buffer = (Q2Record *) calloc (records_per_chunk, sizeof (Q2Record));
-		//printf("run 1 is %d\n", run );
 		int r = fread (buffer, sizeof(Q2Record), records_per_chunk, fp_read);
 		if (r==0){
                     perror("read buffer failed\n");
@@ -114,7 +109,6 @@ int disk_sort_q2(char* filename, int mem, int block_size, char* output_filename)
 
         qsort (buffer, records_per_chunk, sizeof(Q2Record), compare_celebrity);
         
-//		qsort (buffer, records_per_chunk, sizeof(Q2Record), compare);
 		fwrite(buffer, sizeof(Q2Record), records_per_chunk, fp_write);
 		fflush (fp_write);
 

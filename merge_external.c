@@ -181,7 +181,6 @@ int insert_into_heap (MergeManager * merger, int run_id, Record *input){
 int init_merge (MergeManager * manager) {
 	FILE *fp;
 	
-	//printf("%d\n", manager->heap_capacity);
 	int i;
 	for(i = 0; i < manager->heap_capacity; i++){
 		char k[100];
@@ -190,14 +189,11 @@ int init_merge (MergeManager * manager) {
 		strcat(filename,manager->input_prefix);
 		strcat(filename,k);
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
 		if (!(fp = fopen (filename , "rb" ))){
-			//printf("here1\n");
 			free(filename);
 			return FAILURE;
 			
 		}else{
-			//printf("here\n");
 			fseek(fp, manager->current_input_file_positions[i]*sizeof(Record), SEEK_SET);
 			int result = fread (manager->input_buffers[i], sizeof(Record), manager->input_buffer_capacity, fp);
 			if(result <= 0){
@@ -212,18 +208,15 @@ int init_merge (MergeManager * manager) {
 		free(filename);
 	}
 	
-	//printf("end init\n");
 	
 	return SUCCESS;
 }
 
 int flush_output_buffer (MergeManager * manager) {
-	//printf("Write buffer to disk\n");
 	FILE *fp_write;
 	if (!(fp_write = fopen (manager->output_file_name , "a" ))){
 		return FAILURE;
 	}
-	//fseek(fp_write, 0L, SEEK_END);
 	fwrite(manager->output_buffer, sizeof(Record), manager->current_output_buffer_position, fp_write);
 	fflush (fp_write);
 	fclose(fp_write);
@@ -246,7 +239,6 @@ int get_next_input_element(MergeManager * manager, int file_number, Record *resu
 		}
 	}
 	*result = manager->input_buffers[file_number][manager->current_input_buffer_positions[file_number]];
-	//printf("filenumber %d uid1 %d uid2 %d\n", file_number, result->uid1, result->uid2);
 	manager->current_input_buffer_positions[file_number]++;
 	
 	return SUCCESS;
@@ -271,9 +263,7 @@ int refill_buffer (MergeManager * manager, int file_number) {
 			manager->current_input_file_positions[file_number] = -1;
 		}else{
 			manager->current_input_file_positions[file_number]+= result;
-			// if(result < manager->input_buffer_capacity){
-			// 	manager->current_input_file_positions[file_number] = -1;
-			// }
+
 			manager->total_input_buffer_elements[file_number] = result;
 		}
 		
@@ -286,11 +276,9 @@ int refill_buffer (MergeManager * manager, int file_number) {
 void clean_up (MergeManager * merger) {
 	//printf("clean up\n");
 	free(merger->heap);
-	//printf("1\n");
 	int i;
 	for(i = 0; i < merger->heap_capacity; i++){
 		free(merger->input_buffers[i]);
-		//printf("i\n");
 	}
 	for(i = 0; i < merger->heap_capacity; i++){
 		char k[100];
@@ -299,16 +287,12 @@ void clean_up (MergeManager * merger) {
 		strcat(filename,merger->input_prefix);
 		strcat(filename,k);
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
 		remove(filename);
 		free(filename);
 	}
 	free(merger->input_buffers);
-	//printf("2\n");
 	free(merger->output_buffer);
-	//printf("3\n");
 	free(merger);
-	//printf("4\n");
 	
 }
 

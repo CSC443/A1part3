@@ -96,7 +96,6 @@ int q2_insert_into_heap (Q2MergeManager * merger, int run_id, Q2Record *input){
 
 	Q2HeapElement new_heap_element;
 	int child, parent;
-	//printf("heap uid1 %d uid2 %d\n", input->uid1, input->uid2);
 
 	new_heap_element.UID1 = input->uid1;
 	new_heap_element.COUNT = input->count;
@@ -134,7 +133,6 @@ int q2_insert_into_heap (Q2MergeManager * merger, int run_id, Q2Record *input){
 int q2_init_merge (Q2MergeManager * manager) {
 	FILE *fp;
 	
-	//printf("%d\n", manager->heap_capacity);
 	int i;
 	for(i = 0; i < manager->heap_capacity; i++){
 		char k[100];
@@ -143,14 +141,11 @@ int q2_init_merge (Q2MergeManager * manager) {
 		strcat(filename,manager->input_prefix);
 		strcat(filename,k);
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
 		if (!(fp = fopen (filename , "rb" ))){
-			//printf("here1\n");
 			free(filename);
 			return FAILURE;
 			
 		}else{
-			//printf("here\n");
 			fseek(fp, manager->current_input_file_positions[i]*sizeof(Q2Record), SEEK_SET);
 			int result = fread (manager->input_buffers[i], sizeof(Q2Record), manager->input_buffer_capacity, fp);
 			if(result <= 0){
@@ -165,18 +160,15 @@ int q2_init_merge (Q2MergeManager * manager) {
 		free(filename);
 	}
 	
-	//printf("end init\n");
 	
 	return SUCCESS;
 }
 
 int q2_flush_output_buffer (Q2MergeManager * manager) {
-	//printf("Write buffer to disk\n");
 	FILE *fp_write;
 	if (!(fp_write = fopen (manager->output_file_name , "a" ))){
 		return FAILURE;
 	}
-	//fseek(fp_write, 0L, SEEK_END);
 	fwrite(manager->output_buffer, sizeof(Q2Record), manager->current_output_buffer_position, fp_write);
 	fflush (fp_write);
 	fclose(fp_write);
@@ -199,7 +191,6 @@ int q2_get_next_input_element(Q2MergeManager * manager, int file_number, Q2Recor
 		}
 	}
 	*result = manager->input_buffers[file_number][manager->current_input_buffer_positions[file_number]];
-	//printf("filenumber %d uid1 %d uid2 %d\n", file_number, result->uid1, result->uid2);
 	manager->current_input_buffer_positions[file_number]++;
 	
 	return SUCCESS;
@@ -224,9 +215,6 @@ int q2_refill_buffer (Q2MergeManager * manager, int file_number) {
 			manager->current_input_file_positions[file_number] = -1;
 		}else{
 			manager->current_input_file_positions[file_number]+= result;
-			// if(result < manager->input_buffer_capacity){
-			// 	manager->current_input_file_positions[file_number] = -1;
-			// }
 			manager->total_input_buffer_elements[file_number] = result;
 		}
 		
@@ -239,11 +227,9 @@ int q2_refill_buffer (Q2MergeManager * manager, int file_number) {
 void q2_clean_up (Q2MergeManager * merger) {
 	//printf("clean up\n");
 	free(merger->heap);
-	//printf("1\n");
 	int i;
 	for(i = 0; i < merger->heap_capacity; i++){
 		free(merger->input_buffers[i]);
-		//printf("i\n");
 	}
 	for(i = 0; i < merger->heap_capacity; i++){
 		char k[100];
@@ -252,16 +238,12 @@ void q2_clean_up (Q2MergeManager * merger) {
 		strcat(filename,merger->input_prefix);
 		strcat(filename,k);
 		strcat(filename,".dat");
-		//printf("%s\n",filename );
 		remove(filename);
 		free(filename);
 	}
 	free(merger->input_buffers);
-	//printf("2\n");
 	free(merger->output_buffer);
-	//printf("3\n");
 	free(merger);
-	//printf("4\n");
 	
 }
 

@@ -84,9 +84,6 @@ int query2_join(Record *r1, Record *r2, New_MergeManager * merger, int *count){
 				}	
 			}
 		}else if (r1->uid1==r2->uid1){
-			if(r1->uid1 == 5994113){
-				printf("in %d out %d\n", r2->uid2, r1->uid2);
-			}
 	    	merger->current_input_buffer_positions[0]++;
 	    	merger->current_input_buffer_positions[1]++;
 	    	merger->output_buffer_q2 [merger->current_output_buffer_position].uid1=r1->uid1;
@@ -286,20 +283,15 @@ int new_refill_buffer (New_MergeManager * manager, int type) {
 void new_clean_up (New_MergeManager * merger) {
 	int i;
 	for(i = 0; i < 2; i++){
-		//printf("%d\n",i);
 		free(merger->input_buffers[i]);
-		//printf("after %d\n",i);
 	}
 	free(merger->input_buffers);
-	//printf("2\n");
 	if(merger->is_query1 == 0){
 		free(merger->output_buffer);
 	}else{
 		free(merger->output_buffer_q2);
 	}
 	
-	//printf("3\n");
 	free(merger);
-	//printf("4\n");
 	
 }
